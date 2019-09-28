@@ -63,6 +63,9 @@ class Worker(threading.Thread):
         if not self.is_alive() or self.is_idle():
             raise NoTasksException()
 
+        if self.task_queue.empty() and self.return_queue.empty():
+            return
+
         return self.return_queue.get(timeout=timeout)
 
     def wait_all_tasks(self, timeout=None):

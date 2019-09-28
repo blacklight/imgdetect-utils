@@ -6,7 +6,7 @@ import sys
 import cv2
 
 
-def label(img_dir):
+def label(img_dir, scale_factor):
     img_extensions = {'jpg', 'jpeg', 'png', 'bmp'}
     images = sorted([os.path.join(img_dir, f)
                      for f in os.listdir(img_dir)
@@ -23,6 +23,10 @@ def label(img_dir):
     for imgfile in images:
         img = cv2.imread(imgfile)
         img_name = os.path.basename(imgfile)
+
+        if scale_factor != 1:
+            size = (int(img.shape[0]*scale_factor), int(img.shape[1]*scale_factor))
+            img = cv2.resize(img, size)
 
         print('[{}] Keys:'.format(os.path.basename(imgfile)))
 
@@ -63,11 +67,13 @@ def label(img_dir):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--image-dir', '-d', dest='dir', required=True,
-                        help='Directory that contains the images to be processed ' +
-                             '(supported formats: jpg, png, tiff, bmp)')
+            help='Directory that contains the images to be processed ' +
+            '(supported formats: jpg, png, tiff, bmp)')
+    parser.add_argument('--scale-factor', '-s', dest='scale', required=False, default=1,
+            type=float, help='Scale factor to be applied to the images for visualization (default: 1)')
 
     opts, args = parser.parse_known_args(sys.argv[1:])
-    label(img_dir=opts.dir)
+    label(img_dir=opts.dir, scale_factor=opts.scale)
 
 
 if __name__ == '__main__':
